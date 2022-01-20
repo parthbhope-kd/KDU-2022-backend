@@ -3,8 +3,10 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 
+
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
+
 
 
 public class IPL {
@@ -14,63 +16,33 @@ public class IPL {
     static ArrayList<Team> teams = new ArrayList<>();
     static ArrayList<Match> matches = new ArrayList<>();
 
-    public static void fortyWicketsClub(String teamName) {
-        for (Team team : teams) {
-            if (team.teamName.equals(teamName)) {
-                for (Player p : team.squad) {
-                    if (p.wickets > 40) {
-                        p.display();
-                    }
-                }
+    public static void filterBowlers(String teamName, Integer minWickets) {
+        int index = List.of(teamNames).indexOf(teamName);
+        Team team = teams.get(index);
+        for (Player p : team.squad) {
+            if (p.wickets >= minWickets) {
+                p.display();
             }
         }
     }
 
     public static void searchPlayersByName(String key) {
+        if(key == null) {
+            System.out.println("You should have entered valid key");
+            return;
+        }
         for (Team team : teams) {
-            for (Player p : team.squad) {
-                if (p.playerName.contains(key)) {
-                    p.display();
+            for (Player player : team.squad) {
+                if (player.playerName.contains(key)) {
+                    player.display();
                 }
             }
-
         }
     }
 
-    public static void getHighestWicketTakerOfTeam(String teamName) {
-        for (Team team : teams) {
-            if (team.teamName.equals(teamName)) {
-                Integer maxTillNow = 0;
-                Player bestBowler = null;
-                for (Player p : team.squad) {
-                    if (p.wickets >= maxTillNow) {
-                        bestBowler = p;
-                        maxTillNow = p.wickets;
-                    }
-                }
-                assert bestBowler != null;
-                bestBowler.display();
-            }
 
-        }
-    }
 
-    public static void getHighestRunScorerOfTeam(String teamName) {
-        for (Team team : teams) {
-            if (team.teamName.equals(teamName)) {
-                Integer maxTillNow = 0;
-                Player bestScorer = null;
-                for (Player p : team.squad) {
-                    if (p.runs >= maxTillNow) {
-                        bestScorer = p;
-                        maxTillNow = p.runs;
-                    }
-                }
-                assert bestScorer != null;
-                bestScorer.display();
-            }
-        }
-    }
+
 
     public static void gettingTopPerformers() {
         ArrayList<Player> top3Batsmen = getTopPlayersByRole("BATSMEN");
@@ -232,12 +204,14 @@ public class IPL {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter Name of team: ");
         String teamName = sc.next();
+        int index = List.of(teamNames).indexOf(teamName);
+        Team team = teams.get(index);
         System.out.println("Forty Wicket-taker for " + teamName +" are:");
-        fortyWicketsClub(teamName);
+        filterBowlers(teamName, 40);
         System.out.println("Highest Wicket-taker for " + teamName +" is:");
-        getHighestWicketTakerOfTeam(teamName);
+        team.getHighestWicketTakerOfTeam();
         System.out.println("Highest Run-scorer for " + teamName +" is:");
-        getHighestRunScorerOfTeam(teamName);
+        team.getHighestRunScorerOfTeam();
         System.out.println("Top performers of session are: ");
         gettingTopPerformers();
         System.out.println("Next Generation Players:");
@@ -250,7 +224,6 @@ public class IPL {
         csvWriter();
     }
 }
-
 
 class Match {
     Integer matchCount;
@@ -270,7 +243,6 @@ class Match {
         return this.venue;
     }
 }
-
 class Player {
     String playerName;
     String role;
@@ -297,7 +269,6 @@ class Player {
 
 }
 
-
 class Team {
     String teamName;
     ArrayList<Player> squad;
@@ -308,6 +279,33 @@ class Team {
         this.homeGround = newVenue;
         this.squad = new ArrayList<>();
     }
+    public void getHighestRunScorerOfTeam() {
+
+        Integer maxTillNow = 0;
+        Player bestScorer = null;
+        for (Player player : this.squad) {
+            if (player.runs >= maxTillNow) {
+                bestScorer = player;
+                maxTillNow = player.runs;
+            }
+        }
+        assert bestScorer != null;
+        bestScorer.display();
+
+    }
+    public void getHighestWicketTakerOfTeam() {
+
+        Integer maxTillNow = 0;
+        Player bestBowler = null;
+        for (Player player : this.squad) {
+            if (player.wickets >= maxTillNow) {
+                bestBowler = player;
+                maxTillNow = player.wickets;
+            }
+        }
+        assert bestBowler != null;
+        bestBowler.display();
+    }
     void addPlayer(Player player) {
         squad.add(player);
     }
@@ -315,7 +313,6 @@ class Team {
         squad.removeIf(p -> p.equals(player));
     }
 }
-
 
 class Venue {
     String venueName;
@@ -326,4 +323,3 @@ class Venue {
         return this.venueName;
     }
 }
-
